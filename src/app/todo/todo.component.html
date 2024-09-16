@@ -1,0 +1,139 @@
+<div class="max-w-4xl mx-auto p-6 bg-gray-100 mt-10 rounded shadow-lg">
+  <h1 class="text-3xl font-bold mb-6 text-center">ToDo List</h1>
+
+  <form
+    [formGroup]="todoForm"
+    (ngSubmit)="isEditing ? updateTodo() : addTodo()"
+    class="flex flex-col sm:flex-row sm:space-x-4 mb-6"
+  >
+    <input
+      formControlName="title"
+      class="border rounded p-2 flex-grow mb-4 sm:mb-0"
+      placeholder="New task"
+      [class.border-red-500]="
+        todoForm.controls['title'].invalid && todoForm.controls['title'].touched
+      "
+    />
+    <input
+      formControlName="description"
+      class="border rounded p-2 flex-grow mb-4 sm:mb-0"
+      placeholder="Description"
+    />
+    <button
+      type="submit"
+      class="bg-blue-500 text-white px-4 py-2 rounded mb-4 sm:mb-0"
+      [disabled]="todoForm.invalid"
+    >
+      {{ isEditing ? "Update" : "Add" }}
+    </button>
+    <button
+      *ngIf="isEditing"
+      type="button"
+      (click)="cancelEdit()"
+      class="bg-gray-500 text-white px-4 py-2 rounded"
+    >
+      Cancel
+    </button>
+  </form>
+
+  <form
+    class="flex flex-col sm:flex-row sm:items-center pb-4"
+    [formGroup]="searchForm"
+  >
+    <input
+      formControlName="searchTitle"
+      placeholder="Enter title of Todo"
+      class="border rounded p-2 flex-grow mb-4 sm:mb-0"
+      type="text"
+    />
+    <button
+      type="submit"
+      class="bg-blue-500 text-white ml-0 sm:ml-4 px-4 py-2 rounded mb-4 sm:mb-0"
+    >
+      Search
+    </button>
+    <button
+      type="button"
+      class="bg-gray-500 text-white ml-0 sm:ml-4 px-4 py-2 rounded"
+      (click)="clearSearch()"
+    >
+      Clear
+    </button>
+  </form>
+
+  <ul *ngIf="todos.length > 0; else noTodos">
+    <li
+      *ngFor="let todo of todos"
+      class="flex justify-between items-center mb-4 p-4 border rounded shadow-sm bg-white relative"
+    >
+      <div>
+        <span
+          class="font-medium text-lg"
+          [ngClass]="{ 'line-through': todo.completed }"
+        >
+          Title: {{ todo.title }}
+        </span>
+        <p
+          class="font-medium text-sm text-gray-600"
+          [ngClass]="{ 'line-through': todo.completed }"
+          *ngIf="todo.description"
+        >
+          Description: {{ todo.description }}
+        </p>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <label class="switch">
+          <input
+            type="checkbox"
+            [checked]="todo.completed"
+            (change)="toggleCompleted(todo._id!)"
+          />
+          <span class="slider round"></span>
+        </label>
+
+        <button
+          (click)="toggleMenu(todo._id!)"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="12" cy="12" r="1" />
+            <circle cx="19" cy="12" r="1" />
+            <circle cx="5" cy="12" r="1" />
+          </svg>
+        </button>
+
+        <div
+          *ngIf="activeTodoId === todo._id"
+          class="absolute -right-32 mt-0 w-32 bg-white border border-gray-300 rounded shadow-lg z-10"
+        >
+          <button
+            (click)="editTodo(todo)"
+            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+          >
+            Edit
+          </button>
+          <button
+            (click)="deleteTodo(todo._id!)"
+            class="w-full px-4 py-2 text-left text-red-600 hover:bg-gray-100"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <ng-template #noTodos>
+    <div class="text-center text-gray-500 mt-4">
+      No tasks found with title:
+      <span class="font-bold">"{{ searchTitle }}"</span>.
+    </div>
+  </ng-template>
+</div>
